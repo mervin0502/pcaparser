@@ -45,6 +45,7 @@ func ParsePcapHeader(p *Pcap, data []byte) (*PcapHeader, error) {
 	   magicNumberNano  = 0xa1b23c4d
 	   magicNumberNanoR = 0x4d3cb2a1
 	*/
+	// log.Printf("%#x", data[0:4])
 	switch magic {
 	case 0xd4c3b2a1:
 		p.ByteOrder = binary.BigEndian
@@ -52,13 +53,16 @@ func ParsePcapHeader(p *Pcap, data []byte) (*PcapHeader, error) {
 	case 0x4d3cb2a1:
 		p.ByteOrder = binary.BigEndian
 		break
+	case 0xb2ad4c3:
+		p.ByteOrder = binary.LittleEndian
 	default:
 		p.ByteOrder = binary.LittleEndian
 
 	}
-	if magic != DefaultPcapMagic {
-		return nil, errPcapHeaderMagic
-	}
+
+	// if magic != DefaultPcapMagic {
+	// 	return nil, errPcapHeaderMagic
+	// }
 	ph := &PcapHeader{
 		Magic:    magic,
 		Major:    p.ByteOrder.Uint16(data[4:6]),

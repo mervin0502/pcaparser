@@ -5,7 +5,13 @@ import (
 	"io"
 	"log"
 	"os"
+
+	"github.com/golang/glog"
 )
+
+func init() {
+	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
+}
 
 type Pcap struct {
 	Header *PcapHeader
@@ -21,6 +27,7 @@ func NewPcapFromFile(file string) *Pcap {
 	if err != nil {
 		log.Panicln(err)
 	}
+	// r := bufio.NewReader(fp)
 	return NewPcapFromReader(fp)
 }
 
@@ -28,7 +35,7 @@ func NewPcapFromFile(file string) *Pcap {
 func NewPcapFromReader(r io.Reader) *Pcap {
 
 	p := &Pcap{}
-	p.ByteOrder = binary.LittleEndian
+	// p.ByteOrder = binary.LittleEndian
 	p.r = r
 
 	//get 24-bytes
@@ -37,7 +44,11 @@ func NewPcapFromReader(r io.Reader) *Pcap {
 	if err != nil {
 		log.Panicln(err)
 	}
-	p.headerData = data
+	p.Header, err = ParsePcapHeader(p, data)
+	if err != nil {
+		log.Panicln(err)
+	}
+	// p.headerData = data
 	return p
 }
 
@@ -53,17 +64,23 @@ func (p *Pcap) ReadHeader() (*PcapHeader, error) {
 }
 
 //ReadPacket
-func (p *Pcap) ReadPacket() *Packet {
+func (p *Pcap) ReadPacket() (*Packet, error) {
 
 	//ip data
+	// glog.V(2).Infoln("read packet, go...")
 	packet, err := ParsePacket(p)
 	if err != nil {
 		if err == io.EOF {
-			log.Println("done")
-			return nil
+			return nil, err
 		}
-		log.Panicln(err)
+		glog.Warningf("%v", err)
 	}
-	return packet
+	return packet, nil
+}
+
+//Close
+func (p *Pcap) Close() {
+	r, _ := p.r.(*os.File)
+	r.Close()
 
 }

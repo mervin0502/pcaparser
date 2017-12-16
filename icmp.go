@@ -9,17 +9,20 @@ type ICMP struct {
 }
 
 //ParseICMP
-func ParseICMP(data []byte) *ICMP {
+func ParseICMP(data []byte) (*ICMP, error) {
 	i := new(ICMP)
+	if len(data) < DefaultICMPHeaderLen {
+		return nil, errIPv4HeaderTooShort
+	}
 	//header
 	ih, err := ParseICMPHeader(data[0:DefaultICMPHeaderLen])
 	if err != nil {
 		log.Panicln(err)
 	}
 	i.Header = ih
-	log.Println("icmp", ih.String())
+	// log.Println("icmp", ih.String())
 	//data
 	i.Data = data[DefaultICMPHeaderLen:]
 
-	return i
+	return i, nil
 }

@@ -4,6 +4,8 @@ package pcaparser
 Refs:
 https://www.cnblogs.com/qishui/p/5437301.html
 https://github.com/dominikh/go-pcap/blob/master/pcap.go
+https://github.com/Lukasa/gopcap
+
 
 
 File format:
@@ -39,7 +41,36 @@ Packet header format: 16B
 
 0x1A 2B 3C 4D == 439041101
 
+```
+unc ParseEthernetFrame(p Packet) (Frame, error) {
+    data := p.Payload()
+    return &EthernetFrame{
+        header:  data[:17],
+        payload: data[17:],
+    }, nil
+}
 
+type EthernetFrame struct {
+    header  []byte
+    payload []byte
+}
+
+func (e *EthernetFrame) Header() []byte {
+    return e.header
+}
+
+func (e *EthernetFrame) Payload() []byte {
+    return e.payload
+}
+
+func (e *EthernetFrame) Ethertype() uint16 {
+    return binary.LittleEndian.Uint16(e.header[15:17])
+}
+
+func (e *EthernetFrame) String() string {
+    return fmt.Sprintf("Ethernet: payload=%d ethertype=%x", len(e.payload), e.Ethertype())
+}
+```
 Ethernet format:
 前导码：
 Ethernet II是由8个8‘b10101010构成，
@@ -243,6 +274,8 @@ ICMP unreachable
 +---------------------------------+
 |   IP header + 8 byte data         |
 +---------------------------------+
+
+
 
 
 */

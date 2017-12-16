@@ -1,6 +1,6 @@
 package pcaparser
 
-import "log"
+import "github.com/golang/glog"
 
 type Ethernet struct {
 	Header *EthernetHeader
@@ -9,9 +9,11 @@ type Ethernet struct {
 
 func ParseEthernet(data []byte) (*Ethernet, error) {
 	e := &Ethernet{}
+	// log.Println(len(data), EthernetHeaderLen)
 	eh, err := ParseEthernetHeader(data[0:EthernetHeaderLen])
 	if err != nil {
-		log.Panicln(err)
+		glog.Errorln(err)
+		return nil, err
 	}
 
 	e.Header = eh
@@ -23,10 +25,11 @@ func ParseEthernet(data []byte) (*Ethernet, error) {
 		dataObj, err = ParseIPv4(data)
 		break
 	default:
-		log.Println(eh.Type.String())
+		dataObj = nil
+		// log.Println(eh.Type.String())
 	}
 	if err != nil {
-		return nil, err
+		return e, err
 	}
 	e.Data = dataObj
 	return e, nil
