@@ -1,9 +1,5 @@
 package pcaparser
 
-import (
-	"io"
-)
-
 //Packet
 type Packet struct {
 	Header *PacketHeader
@@ -59,25 +55,4 @@ func ParsePacket(pcap *Pcap) (*Packet, error) {
 	// glog.V(2).Infoln("parse packet data(ethernet)")
 	p.Data = e
 	return p, nil
-}
-
-func read(r io.Reader, data []byte, size int) error {
-	temp := make([]byte, size)
-	curLen := 0
-	for {
-		n, err := r.Read(temp)
-		if err != nil {
-			return err
-		}
-		copy(data[curLen:], temp[0:n])
-		curLen += n
-		if curLen < size {
-			temp = make([]byte, size-curLen)
-			continue
-		} else {
-			break
-		}
-	}
-	// temp = nil
-	return nil
 }

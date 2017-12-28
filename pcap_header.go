@@ -30,6 +30,8 @@ type PcapHeader struct {
 	SigFigs  uint32 //0x0
 	SnapLen  uint32
 	LinkType uint32
+
+	data []byte
 }
 
 //ParsePcapHeader
@@ -37,6 +39,7 @@ func ParsePcapHeader(p *Pcap, data []byte) (*PcapHeader, error) {
 	if len(data) < PcapHeaderLen {
 		return nil, errPcapHeaderTooShort
 	}
+
 	magic := binary.LittleEndian.Uint32(data[0:4])
 	/*
 	   magicNumber  = 0xa1b2c3d4
@@ -71,6 +74,7 @@ func ParsePcapHeader(p *Pcap, data []byte) (*PcapHeader, error) {
 		SigFigs:  p.ByteOrder.Uint32(data[12:16]),
 		SnapLen:  p.ByteOrder.Uint32(data[16:20]),
 		LinkType: p.ByteOrder.Uint32(data[20:24]),
+		data:     data,
 	}
 
 	return ph, nil
@@ -79,4 +83,9 @@ func ParsePcapHeader(p *Pcap, data []byte) (*PcapHeader, error) {
 //String
 func (p *PcapHeader) String() string {
 	return fmt.Sprintf("magic=%v major=%v minor=%v thisZone=%v sigFigs=%v snaplen=%v linkType=%v", p.Magic, p.Major, p.Minor, p.ThisZone, p.SigFigs, p.SnapLen, p.LinkType)
+}
+
+//Bytes
+func (p *PcapHeader) Bytes() []byte {
+	return p.data
 }

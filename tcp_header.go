@@ -36,7 +36,7 @@ type TCPHeader struct {
 	Window     uint16
 	Checksum   uint16 // Kernel will set this if it's 0
 	Urgent     uint16
-	Options    []TCPOption
+	Options    []*TCPOption
 }
 
 //TCPOption
@@ -64,7 +64,40 @@ func ParseTCPHeader(data []byte) *TCPHeader {
 	binary.Read(r, binary.BigEndian, &tcp.Window)
 	binary.Read(r, binary.BigEndian, &tcp.Checksum)
 	binary.Read(r, binary.BigEndian, &tcp.Urgent)
+
 	return &tcp
+}
+
+//parseTCPOptions
+func ParseTCPOptions(data []byte) []*TCPOption {
+	_len := len(data)
+	if _len == 0 {
+		return nil
+	}
+	r := bytes.NewReader(data)
+	opts := make([]*TCPOption, 0)
+
+	ok := false
+	for {
+		var opt TCPOption
+		binary.Read(r, binary.BigEndian, &opt.Kind)
+		switch int(opt.Kind) {
+		case 0:
+			ok = true
+			break
+		case 1:
+			break
+		default:
+			binary.Read(r, binary.BigEndian, &opt.Length)
+			opt.Data = make([]byte, int(opt.Length))
+			binary.Read(r, binary.BigEndian, &opt.Data)
+		}
+		opts = append(opts, &opt)
+		if ok {
+			break
+		}
+	}
+	return opts
 }
 
 //String

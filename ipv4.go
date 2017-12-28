@@ -1,6 +1,10 @@
 package pcaparser
 
-import "log"
+import (
+	"fmt"
+
+	"github.com/golang/glog"
+)
 
 //IPv4
 type IPv4 struct {
@@ -15,7 +19,8 @@ func ParseIPv4(data []byte) (*IPv4, error) {
 	//header
 	ih, err := ParseIPv4Header(data)
 	if err != nil {
-		log.Panicln(err)
+		glog.Errorln(err)
+		return nil, err
 	}
 	i.Header = ih
 	//data
@@ -38,27 +43,13 @@ func ParseIPv4(data []byte) (*IPv4, error) {
 	// case IP_IPv4Type:
 
 	// 	break
-	// case IP_TCPType:
-	// 	ParseTCP(data)
-	// 	break
-	// case IP_EGPType:
-
-	// 	break
-	// case IP_IGPType:
-
-	// 	break
-	// case IP_UDPType:
-
-	// 	break
-	// case IP_RDPType:
-
-	// 	break
-	// case IP_IPv6Type:
-
-	// 	break
 	default:
 		// ParseTCP(data)
 		break
 	}
 	return i, err
+}
+
+func (i *IPv4) String() string {
+	return fmt.Sprintf("%s \n\n %s", i.Header.String(), i.Data)
 }
