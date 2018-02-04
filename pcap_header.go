@@ -40,7 +40,8 @@ func ParsePcapHeader(p *Pcap, data []byte) (*PcapHeader, error) {
 		return nil, errPcapHeaderTooShort
 	}
 
-	magic := binary.LittleEndian.Uint32(data[0:4])
+	magic := binary.BigEndian.Uint32(data[0:4])
+
 	/*
 	   magicNumber  = 0xa1b2c3d4
 	   magicNumberR = 0xd4c3b2a1
@@ -48,21 +49,19 @@ func ParsePcapHeader(p *Pcap, data []byte) (*PcapHeader, error) {
 	   magicNumberNano  = 0xa1b23c4d
 	   magicNumberNanoR = 0x4d3cb2a1
 	*/
-	// log.Printf("%#x", data[0:4])
+	// glog.Warningf("%#x %#x", magic, data[0:4])
 	switch magic {
+	case 0xa1b2c3d4:
+		p.ByteOrder = binary.BigEndian
+		break
 	case 0xd4c3b2a1:
-		p.ByteOrder = binary.BigEndian
-		break
-	case 0x4d3cb2a1:
-		p.ByteOrder = binary.BigEndian
-		break
-	case 0xb2ad4c3:
 		p.ByteOrder = binary.LittleEndian
+		break
 	default:
-		p.ByteOrder = binary.LittleEndian
+		p.ByteOrder = binary.BigEndian
 
 	}
-
+	// glog.V(2).Infof("%v", p.ByteOrder)
 	// if magic != DefaultPcapMagic {
 	// 	return nil, errPcapHeaderMagic
 	// }

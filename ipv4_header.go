@@ -20,8 +20,6 @@ var (
 
 	// See http://www.freebsd.org/doc/en/books/porters-handbook/freebsd-versions.html.
 	freebsdVersion uint32
-
-	// nativeEndian binary.ByteOrder
 )
 
 type IPv4HeaderFlags int
