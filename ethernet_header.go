@@ -13,7 +13,7 @@ const (
 )
 
 var (
-	errEthernetHeaderTooShort = errors.New("ethernet header too short.")
+	ErrEthernetHeaderTooShort = errors.New("ethernet header too short.")
 )
 
 type EtherType uint16
@@ -60,7 +60,7 @@ type EthernetHeader struct {
 //ParserEthernetHeader
 func ParseEthernetHeader(data []byte) (*EthernetHeader, error) {
 	if len(data) < EthernetHeaderLen {
-		return nil, errEthernetHeaderTooShort
+		return nil, ErrEthernetHeaderTooShort
 	}
 	e := &EthernetHeader{
 		DstMac: data[0:6],

@@ -15,7 +15,7 @@ const (
 )
 
 var (
-	errIPv4HeaderTooShort = errors.New("header too short")
+	ErrIPv4HeaderTooShort = errors.New("header too short")
 	errBufferTooShort     = errors.New("buffer too short")
 
 	// See http://www.freebsd.org/doc/en/books/porters-handbook/freebsd-versions.html.
@@ -71,7 +71,7 @@ func (h *IPv4Header) String() string {
 // ParseIPv4Header parses b as an IPv4 header.
 func ParseIPv4Header(b []byte) (*IPv4Header, error) {
 	if len(b) < IPv4HeaderLen {
-		return nil, errIPv4HeaderTooShort
+		return nil, ErrIPv4HeaderTooShort
 	}
 	hdrlen := int(b[0]&0x0f) << 2
 	if hdrlen > len(b) {

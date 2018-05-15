@@ -1,5 +1,9 @@
 package pcaparser
 
+import (
+	"time"
+)
+
 //Packet
 type Packet struct {
 	Header *PacketHeader
@@ -48,11 +52,16 @@ func ParsePacket(pcap *Pcap) (*Packet, error) {
 	// glog.V(2).Infoln("read bytes for data")
 	//ethernet
 	e, err := ParseEthernet(data)
-	if err != nil {
-		// glog.Errorf("parse ethernet error: %v", err)
-		return p, err
-	}
+	// if err != nil {
+	// 	glog.Errorf("parse ethernet error:%p,  %v", p, err)
+	// 	// return p, err
+	// }
 	// glog.V(2).Infoln("parse packet data(ethernet)")
 	p.Data = e
-	return p, nil
+	return p, err
+}
+
+//Time
+func (ph *Packet) Time() time.Time {
+	return time.Unix(int64(ph.Header.TimestampOfSec), int64(ph.Header.TimestampOfMicrosec)*1000)
 }

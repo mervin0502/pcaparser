@@ -96,6 +96,7 @@ func (p *Pcap) SplitWithTime(dstFile string, start time.Time, end time.Time, sor
 		glog.Errorln(err)
 	}
 	fp.Write(p.Header.Bytes())
+	defer fp.Close()
 
 	var cur time.Time
 	var packetData []byte
@@ -122,6 +123,9 @@ Loop:
 		cur = time.Unix(int64(ph.TimestampOfSec), int64(ph.TimestampOfMicrosec)*1000)
 		cur = cur.In(start.Location())
 
+		// glog.V(2).Infof("%v", cur)
+		// break Loop
+
 		if ph.IncludedLen > p.Header.SnapLen {
 			readDataLen = int(p.Header.SnapLen)
 		} else {
@@ -131,17 +135,19 @@ Loop:
 		err = read(p.r, packetData, readDataLen)
 		if err != nil {
 			if err == io.EOF {
-				fp.Write(packetHeaderData)
+				fp.Write(append(packetHeaderData, packetData...))
 				break
 			}
 			glog.Errorln(err)
 		}
 		//to buf
 		// glog.V(2).Infof("%s %s %s", cur, start, end)
-		if cur.UnixNano() < start.UnixNano() {
+		if cur.Before(start) {
+			// if cur.UnixNano() < start.UnixNano() {
 			continue
 		}
-		if cur.UnixNano() > end.UnixNano() {
+		if cur.After(end) {
+			// if cur.UnixNano() > end.UnixNano() {
 			if sorted {
 				coutner += 1
 			}

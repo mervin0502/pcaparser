@@ -20,8 +20,9 @@ const (
 )
 
 var (
-	errMissingTCPHeader  = errors.New("missing tcp header")
-	errTCPHeaderTooShort = errors.New("tcp header too short")
+	ErrMissingTCPHeader      = errors.New("missing tcp header")
+	ErrTCPHeaderTooShort     = errors.New("tcp header too short")
+	ErrTCPHeaderOnlyWithPort = errors.New("tcp header only has the ports")
 )
 
 //TCPHeader

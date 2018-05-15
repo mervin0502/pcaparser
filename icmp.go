@@ -12,7 +12,7 @@ type ICMP struct {
 func ParseICMP(data []byte) (*ICMP, error) {
 	i := new(ICMP)
 	if len(data) < DefaultICMPHeaderLen {
-		return nil, errIPv4HeaderTooShort
+		return nil, ErrIPv4HeaderTooShort
 	}
 	//header
 	ih, err := ParseICMPHeader(data[0:DefaultICMPHeaderLen])

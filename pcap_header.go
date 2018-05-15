@@ -1,6 +1,7 @@
 package pcaparser
 
 import (
+	"bytes"
 	"encoding/binary"
 	"errors"
 	"fmt"
@@ -17,8 +18,8 @@ const (
 
 //errors
 var (
-	errPcapHeaderTooShort = errors.New("pcap header too short.")
-	errPcapHeaderMagic    = errors.New("not the pcap file based on magic field")
+	ErrPcapHeaderTooShort = errors.New("pcap header too short.")
+	ErrPcapHeaderMagic    = errors.New("not the pcap file based on magic field")
 )
 
 //PcapHeader
@@ -32,12 +33,13 @@ type PcapHeader struct {
 	LinkType uint32
 
 	data []byte
+	bo   binary.ByteOrder
 }
 
 //ParsePcapHeader
 func ParsePcapHeader(p *Pcap, data []byte) (*PcapHeader, error) {
 	if len(data) < PcapHeaderLen {
-		return nil, errPcapHeaderTooShort
+		return nil, ErrPcapHeaderTooShort
 	}
 
 	magic := binary.BigEndian.Uint32(data[0:4])
@@ -58,8 +60,8 @@ func ParsePcapHeader(p *Pcap, data []byte) (*PcapHeader, error) {
 		p.ByteOrder = binary.LittleEndian
 		break
 	default:
-		p.ByteOrder = binary.BigEndian
-
+		// p.ByteOrder = binary.BigEndian
+		return nil, ErrPcapHeaderMagic
 	}
 	// glog.V(2).Infof("%v", p.ByteOrder)
 	// if magic != DefaultPcapMagic {
@@ -74,6 +76,7 @@ func ParsePcapHeader(p *Pcap, data []byte) (*PcapHeader, error) {
 		SnapLen:  p.ByteOrder.Uint32(data[16:20]),
 		LinkType: p.ByteOrder.Uint32(data[20:24]),
 		data:     data,
+		bo:       p.ByteOrder,
 	}
 
 	return ph, nil
@@ -85,6 +88,14 @@ func (p *PcapHeader) String() string {
 }
 
 //Bytes
-func (p *PcapHeader) Bytes() []byte {
-	return p.data
+func (p PcapHeader) Bytes() []byte {
+	var buf bytes.Buffer
+	binary.Write(&buf, binary.BigEndian, p.Magic)
+	binary.Write(&buf, p.bo, p.Major)
+	binary.Write(&buf, p.bo, p.Minor)
+	binary.Write(&buf, p.bo, p.ThisZone)
+	binary.Write(&buf, p.bo, p.SigFigs)
+	binary.Write(&buf, p.bo, p.SnapLen)
+	binary.Write(&buf, p.bo, p.LinkType)
+	return buf.Bytes()
 }

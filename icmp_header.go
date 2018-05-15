@@ -11,7 +11,7 @@ const (
 )
 
 var (
-	errICMPHeaderTooShort = errors.New("icmp header too short.")
+	ErrICMPHeaderTooShort = errors.New("icmp header too short.")
 )
 
 //ICMPHeader
@@ -25,7 +25,7 @@ type ICMPHeader struct {
 //ParseICMPHeader
 func ParseICMPHeader(data []byte) (*ICMPHeader, error) {
 	if len(data) < DefaultICMPHeaderLen {
-		return nil, errICMPHeaderTooShort
+		return nil, ErrICMPHeaderTooShort
 	}
 	i := &ICMPHeader{
 		Type:     uint8(data[0]),

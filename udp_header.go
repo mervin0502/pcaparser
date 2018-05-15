@@ -7,8 +7,9 @@ import (
 )
 
 var (
-	errMissingUDPHeader  = errors.New("missing header")
-	errUDPHeaderTooShort = errors.New("UDP header too short")
+	ErrMissingUDPHeader      = errors.New("missing header")
+	ErrUDPHeaderTooShort     = errors.New("UDP header too short")
+	ErrUDPHeaderOnlyWithPort = errors.New("UDP header only has the ports")
 )
 
 const (
