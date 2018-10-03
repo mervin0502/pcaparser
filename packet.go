@@ -51,6 +51,10 @@ func ParsePacket(pcap *Pcap) (*Packet, error) {
 	}
 	// glog.V(2).Infoln("read bytes for data")
 	//ethernet
+	if len(data) < EthernetHeaderLen {
+		p.Data = data
+		return p, nil
+	}
 	e, err := ParseEthernet(data)
 	// if err != nil {
 	// 	glog.Errorf("parse ethernet error:%p,  %v", p, err)

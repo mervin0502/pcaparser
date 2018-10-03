@@ -5,6 +5,8 @@ type TCP struct {
 	Header  *TCPHeader
 	Data    interface{}
 	DataLen int
+
+	raw []byte
 }
 
 type TCPType uint16
@@ -16,6 +18,7 @@ const (
 //ParseTCP
 func ParseTCP(data []byte) (*TCP, error) {
 	t := &TCP{}
+	t.raw = data
 	dataLen := len(data)
 	if dataLen < DefaultTCPHeaderLen {
 		if dataLen >= 4 {
@@ -52,4 +55,27 @@ func ParseTCP(data []byte) (*TCP, error) {
 	}
 
 	return t, err
+}
+
+//HeaderBytes return the bytes of tcp header
+func (t *TCP) HeaderBytes() []byte {
+	var tcpHeaderLen int
+	 dataLen := len(t.raw)
+	tcpHeaderLen = int(t.Header.DataOffset * 4)
+	if tcpHeaderLen > dataLen {
+		tcpHeaderLen = dataLen
+	}
+	return t.raw[0:tcpHeaderLen]
+}
+
+
+//DataBytes return the bytes of tcp data
+func (t *TCP) DataBytes() []byte {
+	var tcpHeaderLen int
+	dataLen := len(t.raw)
+	tcpHeaderLen = int(t.Header.DataOffset * 4)
+	if tcpHeaderLen > dataLen {
+		tcpHeaderLen = dataLen
+	}
+	return t.raw[tcpHeaderLen:]
 }

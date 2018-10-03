@@ -5,11 +5,14 @@ type UDP struct {
 	Header  *UDPHeader
 	Data    []byte
 	DataLen int
+
+	raw []byte
 }
 
 //ParseUDP
 func ParseUDP(data []byte) (*UDP, error) {
 	t := &UDP{}
+	t.raw = data
 	//header
 	if len(data) < DefaultUDPHeaderLen {
 		if len(data) >= 4 {
@@ -26,4 +29,14 @@ func ParseUDP(data []byte) (*UDP, error) {
 	t.DataLen = len(data[DefaultUDPHeaderLen:])
 	t.Data = data[DefaultUDPHeaderLen:]
 	return t, nil
+}
+//HeaderBytes return the bytes of tcp header
+func (t *UDP) HeaderBytes() []byte {
+	return t.raw[0:DefaultUDPHeaderLen]
+}
+
+
+//DataBytes return the bytes of tcp data
+func (t *UDP) DataBytes() []byte {
+	return t.raw[DefaultUDPHeaderLen:]
 }

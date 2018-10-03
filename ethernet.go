@@ -9,7 +9,7 @@ type Ethernet struct {
 
 func ParseEthernet(data []byte) (*Ethernet, error) {
 	e := &Ethernet{}
-	// log.Println(len(data), EthernetHeaderLen)
+	// glog.Info(len(data), EthernetHeaderLen)
 	eh, err := ParseEthernetHeader(data[0:EthernetHeaderLen])
 	if err != nil {
 		glog.Errorln(err)
